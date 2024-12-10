@@ -5,6 +5,7 @@ export default function Home() {
   return (
     <main><h1>Main Page</h1>
     <Link href="/users"> Users</Link>
+    <h2><Link href="/users/names"> Names from the mongosh </Link></h2>
     <ProductCard />
     </main>
   )
