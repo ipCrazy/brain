@@ -21,8 +21,7 @@ With this we are starting a new *Next.js* app
 ### Answers to  promts
 
 
-What is your project named? my-app  
-**Name of your app** 
+What is your project named? my-app**Name of your app** 
 Would you like to use TypeScript? **Yes**
 Would you like to use ESLint? **Yes**
 Would you like to use Tailwind CSS? **Yes**
