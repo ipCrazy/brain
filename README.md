@@ -20,22 +20,11 @@ With this we are starting a new *Next.js* app
 
 ### Answers to  promts
 
-
-**What is your project named?**
-- name of your App
-**Would you like to use TypeScript?**
-- Yes
-**Would you like to use ESLint?**
-- Yes
-**Would you like to use Tailwind CSS?**
-- Yes
-**Would you like your code inside a `src/` directory?**
-- No
-**Would you like to use App Router? (recommended)**
-- Yes
-**Would you like to use Turbopack for `next dev`?**
-- No
-**Would you like to customize the import alias (`@/*` by default)?**
-- No
-
-
+What is your project named? **Name of your app**
+Would you like to use TypeScript? **YES**
+Would you like to use ESLint? **YES**
+Would you like to use Tailwind CSS? N**YES**
+Would you like your code inside a `src/` directory? **NO**
+Would you like to use App Router? (recommended) **YES**
+Would you like to use Turbopack for `next dev`?  **NO**
+Would you like to customize the import alias (`@/*` by default)? **NO**
