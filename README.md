@@ -28,3 +28,8 @@ Would you like your code inside a `src/` directory? **NO**
 Would you like to use App Router? (recommended) **YES**  
 Would you like to use Turbopack for `next dev`?  **NO**  
 Would you like to customize the import alias (`@/*` by default)? **NO**  
+
+### Edit files for first use
+
+App/page.tsx ---> clean or return h1 ( Hello world )
+global.css ---> add some padding to visualise changes
