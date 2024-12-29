@@ -32,4 +32,13 @@ Would you like to customize the import alias (`@/*` by default)? **NO**
 ### Edit files for first use
 
 App/page.tsx ---> clean or return h1 ( Hello world )
-global.css ---> add some padding to visualise changes
+global.css ---> add some padding  or play with colors to visualise changes
+
+###
+
+Create 
+
+*api/country/route.ts
+*country/page.tsx
+
+implement ollama structured output
