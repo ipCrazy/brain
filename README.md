@@ -34,11 +34,13 @@ Would you like to customize the import alias (`@/*` by default)? **NO**
 App/page.tsx ---> clean or return h1 ( Hello world )
 global.css ---> add some padding  or play with colors to visualise changes
 
-###
-
-Create 
+### Add basic functinalities/logc and test
 
 *api/country/route.ts
 *country/page.tsx
 
 implement ollama structured output
+
+npm install next-auth
+(check  https://next-auth.js.org/getting-started/example )
+npm install bcrypt - for password hashing
