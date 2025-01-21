@@ -20,7 +20,7 @@ export default function CreatePage() {
     }
 
     try {
-      const response = await fetch("/api/sest/create", {
+      const response = await fetch("/api/crud/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
