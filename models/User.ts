@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, models, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 // Definiši interfejs za korisničke podatke
@@ -16,19 +16,18 @@ const userSchema = new Schema<User>({
 });
 
 // Pre nego što sačuvamo korisnika, heširaj lozinku
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   const user = this as User;
 
   if (!user.isModified('password')) {
     return next();
   }
 
-  // Heširanje lozinke
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
   next();
 });
 
-// Kreiraj i exportuj model
-const UserModel = model<User>('User', userSchema);
+// Kreiraj i exportuj model samo ako već ne postoji
+const UserModel = models.User || model<User>('User', userSchema);
 export default UserModel;

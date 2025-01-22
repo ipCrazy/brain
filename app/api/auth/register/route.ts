@@ -1,29 +1,66 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import UserModel from '../../../models/User';
-import connectToDatabase from '../../../lib/mongo';
+import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import UserModel from '../../../../models/User';
+import connectToDatabase from '../../../../lib/mongo';
+import { z } from 'zod';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    try {
-      const { name, email, password } = req.body;
+// Definišemo Zod šemu za validaciju
+const userSchema = z.object({
+  name: z.string().min(3, 'Name must be at least 3 characters long.'),
+  email: z.string().email('Invalid email format.'),
+  password: z.string().min(8, 'Password must be at least 8 characters long.'),
+});
 
-      // Proveravamo da li korisnik već postoji
-      await connectToDatabase();
+export async function POST(request: Request) {
+  try {
+    // Parsiranje podataka iz zahteva
+    const body = await request.json();
 
-      const existingUser = await UserModel.findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ error: 'User already exists' });
-      }
-
-      // Kreiranje novog korisnika
-      const newUser = new UserModel({ name, email, password });
-      await newUser.save();
-
-      return res.status(201).json({ message: 'User created successfully' });
-    } catch (error) {
-      return res.status(500).json({ error: 'Something went wrong' });
+    // Validacija pomoću Zod šeme
+    const validation = userSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.issues.map((issue) => issue.message) },
+        { status: 400 }
+      );
     }
-  } else {
-    res.status(405).json({ error: 'Method Not Allowed' });
+
+    const { name, email, password } = body;
+
+    // Povezivanje sa bazom podataka
+    await connectToDatabase();
+
+    // Proveravamo da li korisnik već postoji
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'User with this email already exists.' },
+        { status: 400 }
+      );
+    }
+
+    // Heširanje lozinke
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Kreiranje novog korisnika
+    const newUser = new UserModel({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    // Snimanje korisnika u bazu
+    await newUser.save();
+
+    return NextResponse.json(
+      { message: 'User registered successfully.' },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error:', error);
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again later.' },
+      { status: 500 }
+    );
   }
 }
