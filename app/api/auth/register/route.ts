@@ -1,37 +1,39 @@
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import UserModel from '../../../../models/User';
 import connectToDatabase from '../../../../lib/mongo';
 import { z } from 'zod';
 
-// Definišemo Zod šemu za validaciju
+// Define Zod schema for validation
 const userSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
   email: z.string().email('Invalid email format.'),
-  password: z.string().min(8, 'Password must be at least 8 characters long.'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long.')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter.')
+    .regex(/[0-9]/, 'Password must contain at least one number.')
+    .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character.'),
 });
 
 export async function POST(request: Request) {
   try {
-    // Parsiranje podataka iz zahteva
+    // Parse request body
     const body = await request.json();
 
-    // Validacija pomoću Zod šeme
+    // Validate input with Zod schema
     const validation = userSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json(
-        { error: validation.error.issues.map((issue) => issue.message) },
-        { status: 400 }
-      );
+      const firstError = validation.error.issues[0].message;
+      return NextResponse.json({ error: firstError }, { status: 400 });
     }
 
     const { name, email, password } = body;
 
-    // Povezivanje sa bazom podataka
+    // Connect to the database
     await connectToDatabase();
 
-    // Proveravamo da li korisnik već postoji
-    const existingUser = await UserModel.findOne({ email });
+    // Check if the user already exists
+    const existingUser = await UserModel.findOne({ email }).select('_id');
     if (existingUser) {
       return NextResponse.json(
         { error: 'User with this email already exists.' },
@@ -39,17 +41,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Heširanje lozinke
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Kreiranje novog korisnika
+    // Create a new user
     const newUser = new UserModel({
       name,
       email,
-      password: hashedPassword,
+      password, // Raw password; hashing is handled by Mongoose middleware
     });
 
-    // Snimanje korisnika u bazu
+    // Save the user to the database
     await newUser.save();
 
     return NextResponse.json(
@@ -59,7 +58,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json(
-      { error: 'Something went wrong. Please try again later.' },
+      { error: 'An unexpected error occurred. Please try again later.' },
       { status: 500 }
     );
   }

@@ -15,7 +15,6 @@ const userSchema = new Schema<User>({
   password: { type: String, required: true },
 });
 
-// Pre nego što sačuvamo korisnika, heširaj lozinku
 userSchema.pre('save', async function (next) {
   const user = this as User;
 
@@ -23,8 +22,13 @@ userSchema.pre('save', async function (next) {
     return next();
   }
 
+  console.log('Original password before hashing:', user.password);
   const salt = await bcrypt.genSalt(10);
+  console.log('Generated salt:', salt);
+
   user.password = await bcrypt.hash(user.password, salt);
+  console.log('Hashed password:', user.password);
+
   next();
 });
 
