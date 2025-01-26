@@ -1,72 +1,62 @@
-import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import UserModel from '@/models/User';
-import connectToDatabase from '@/lib/mongo';
-import { generateToken } from '@/utils/jwt'; // Assuming you have a JWT generation function
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import bcrypt from "bcryptjs";
+import UserModel from "@/models/User";
+import connectToDatabase from "@/lib/mongo";
+import { generateToken } from "@/utils/jwt"; // Assuming you have a JWT generation function
 
 export async function POST(request: Request) {
   try {
     await connectToDatabase(); // Connect to MongoDB
 
-    const body = await request.json();
-    const { email, password } = body;
+    const { email, password } = await request.json();
 
     // Validate email and password
     if (!email || !password) {
-      console.log('Missing email or password:', { email, password });
       return NextResponse.json(
-        { error: 'Email and password are required.' },
+        { error: "Email and password are required." },
         { status: 400 }
       );
     }
 
     // Find user by email
-    const user = await UserModel.findOne({ email }).select('password'); 
+    const user = await UserModel.findOne({ email }).select("password");
     if (!user) {
-      console.log('User not found for email:', email);
       return NextResponse.json(
-        { error: 'Invalid email or password.' },
+        { error: "Invalid email or password." },
         { status: 400 }
       );
     }
-
-    // Debugging logs: print the password from client and stored hash
-    console.log('Password from client:', password);
-    console.log('Password hash from database:', user.password);
 
     // Validate password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      console.log('Invalid password for user:', email);
       return NextResponse.json(
-        { error: 'Invalid email or password.' },
+        { error: "Invalid email or password." },
         { status: 400 }
       );
     }
 
-    // Generate token (replace with your implementation)
-    let token;
-    try {
-      token = generateToken(user._id); 
-      console.log('Generated token for user:', email, 'Token:', token);
-    } catch (tokenError) {
-      console.error('Error generating token:', tokenError);
-      return NextResponse.json(
-        { error: 'Failed to generate authentication token.' },
-        { status: 500 }
-      );
-    }
+    // Generate token
+    const token = generateToken(user._id); // Assume this creates a valid JWT token
+    console.log("Token:", token);
+    // Set token in cookie
+    const cookieStore = await cookies();
+    cookieStore.set("auth-token", token, {
+      httpOnly: true, // Prevents access from JavaScript
+      secure: process.env.NODE_ENV === "production", // Ensures HTTPS in production
+      maxAge: 60 * 60 * 24, // 1 day in seconds
+      path: "/", // Makes the cookie available across the entire app
+    });
 
-    // Login successful
-    console.log('Login successful for user:', email);
     return NextResponse.json(
-      { message: 'Login successful.', token },
+      { message: "Login successful." },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error("Unexpected error:", error);
     return NextResponse.json(
-      { error: 'Something went wrong. Please try again later.' },
+      { error: "Something went wrong. Please try again later." },
       { status: 500 }
     );
   }
