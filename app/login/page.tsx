@@ -2,19 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log('Form submitted');
-    console.log('Email:', email);
-    console.log('Password:', password);
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -23,63 +22,55 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      console.log('Fetch response received');
       const data = await res.json();
 
-      console.log('Response status:', res.status);
-      console.log('Response data:', data);
-
       if (res.ok) {
-        console.log('Login successful');
-        // Čuvanje tokena u localStorage (ili cookie, ako koristiš server-side auth)
         localStorage.setItem('token', data.token);
-
-        // Preusmeravanje na dashboard ili neku drugu stranicu
-        console.log('Redirecting to dashboard');
         router.push('/dashboard');
       } else {
-        console.error('Error response:', data);
-        setError(data.error || 'An error occurred.');
+        setError(data.error || 'An error occurred');
       }
     } catch (error) {
-      console.error('Fetch error:', error);
-      setError('An error occurred while logging in.');
+      setError('An error occurred while logging in');
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-96 space-y-4"
-      >
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-96 space-y-4">
         <h1 className="text-2xl font-bold text-center">Login</h1>
-
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => {
-            console.log('Email input changed:', e.target.value);
-            setEmail(e.target.value);
-          }}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full p-2 border rounded"
           required
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => {
-            console.log('Password input changed:', e.target.value);
-            setPassword(e.target.value);
-          }}
-          className="w-full p-2 border rounded"
-          required
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-2 border rounded pr-10"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+          >
+            {showPassword ? (
+              <EyeSlashIcon className="h-5 w-5 text-gray-500" />
+            ) : (
+              <EyeIcon className="h-5 w-5 text-gray-500" />
+            )}
+          </button>
+        </div>
 
         <button
           type="submit"
@@ -87,6 +78,13 @@ export default function LoginPage() {
         >
           Login
         </button>
+
+        <p className="text-center text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link href="/register" className="text-blue-500 hover:underline">
+            Register here
+          </Link>
+        </p>
       </form>
     </div>
   );
