@@ -34,4 +34,16 @@ userSchema.pre('save', async function (next) {
 
 // Kreiraj i exportuj model samo ako već ne postoji
 const UserModel = models.User || model<User>('User', userSchema);
+
+// Dodaj funkciju za dobijanje korisnika po ID-u
+export async function getUserById(userId: string) {
+  try {
+    const user = await UserModel.findById(userId).exec();
+    return user;
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    return null;
+  }
+}
+
 export default UserModel;
