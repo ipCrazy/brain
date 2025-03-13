@@ -1,25 +1,28 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { cookies } from "next/headers"; // Ensure this import is correct
+import { cookies } from "next/headers";
 import { publicRoutes } from "./config/routes";
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check if the user is already logged in
+  // Proveri da li je korisnik ulogovan (asinhrono dohvatanje cookies)
   const cookieStore = await cookies();
   const token = cookieStore.get("auth-token")?.value;
 
-  // If the user is logged in and tries to access login or register routes, redirect to dashboard
-  if (token && publicRoutes.includes(pathname)) {
-    const dashboardUrl = new URL("/", request.url);
-    return NextResponse.redirect(dashboardUrl);
+  // Ako je ulogovan i ode na `/`, preusmeri ga na `/dashboard`
+  if (token && pathname === "/") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // If the user is trying to access a protected route and is not logged in, redirect to /login
+  // Ako je ulogovan i pokušava da pristupi public rutama (login/register), preusmeri na dashboard
+  if (token && publicRoutes.includes(pathname)) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  // Ako nije ulogovan i pokušava da pristupi privatnim rutama, preusmeri ga na login
   if (!token && !publicRoutes.includes(pathname)) {
-    const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
