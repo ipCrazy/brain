@@ -1,1 +1,6 @@
-export const publicRoutes = ["/login", "/register", "/api/login", "/api/register"];
+export const publicRoutes = [
+  "/login",
+  "/register",
+  "/api/login",
+  "/api/register",
+];

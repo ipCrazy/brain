@@ -1,4 +1,4 @@
-'use client'
+"use client";
 // Example: Fetching user data in a React component
 import { useEffect, useState } from "react";
 
@@ -9,7 +9,7 @@ interface User {
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
-   
+
   useEffect(() => {
     fetch("/api/auth/me")
       .then((response) => {

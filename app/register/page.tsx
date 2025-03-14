@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -30,24 +30,24 @@ export default function RegisterPage() {
     setSuccess(null);
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       setShake(true);
       return;
     }
 
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      if (!res.ok) throw new Error(data.error || "Registration failed");
 
-      setSuccess('Registration successful! Redirecting...');
-      setTimeout(() => router.push('/login'), 2000);
+      setSuccess("Registration successful! Redirecting...");
+      setTimeout(() => router.push("/login"), 2000);
     } catch (err: any) {
       setError(err.message);
       setShake(true);
@@ -69,7 +69,7 @@ export default function RegisterPage() {
       <form
         onSubmit={handleSubmit}
         className={`p-6 bg-white rounded shadow-md w-80 space-y-4 transition-transform duration-300 ${
-          shake ? 'animate-shake' : ''
+          shake ? "animate-shake" : ""
         }`}
       >
         <h2 className="text-2xl font-bold text-center">Register</h2>
@@ -96,7 +96,7 @@ export default function RegisterPage() {
 
         <div className="relative">
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             name="password"
             placeholder="Password"
             value={formData.password}
@@ -118,7 +118,7 @@ export default function RegisterPage() {
 
         <div className="relative">
           <input
-            type={showConfirmPassword ? 'text' : 'password'}
+            type={showConfirmPassword ? "text" : "password"}
             name="confirmPassword"
             placeholder="Confirm Password"
             value={formData.confirmPassword}
@@ -146,7 +146,7 @@ export default function RegisterPage() {
         </button>
 
         <p className="text-center text-sm text-gray-600">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link href="/login" className="text-blue-500 hover:underline">
             Login here
           </Link>

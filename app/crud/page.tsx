@@ -28,7 +28,8 @@ export default function CreatePage() {
         body: JSON.stringify({ name, email, age: Number(age) }),
       });
 
-      if (!response.ok) { // Check for HTTP errors (4xx or 5xx)
+      if (!response.ok) {
+        // Check for HTTP errors (4xx or 5xx)
         const errorData = await response.json();
         throw new Error(errorData.message || `HTTP error ${response.status}`);
       }
@@ -38,8 +39,9 @@ export default function CreatePage() {
       setName(""); // Reset form fields
       setEmail("");
       setAge("");
-    } catch (err: any) { // Type 'any' for error, as it can be various types
-        console.error("Error submitting form:", err);
+    } catch (err: any) {
+      // Type 'any' for error, as it can be various types
+      console.error("Error submitting form:", err);
       if (err.message) {
         setError(err.message); // Set error message from the caught error
       } else {
@@ -49,7 +51,9 @@ export default function CreatePage() {
   };
 
   return (
-    <div> {/* Ovo je dodato da bi se izbegla potencijalna greška sa fragmentima */}
+    <div>
+      {" "}
+      {/* Ovo je dodato da bi se izbegla potencijalna greška sa fragmentima */}
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -68,13 +72,17 @@ export default function CreatePage() {
         <input
           type="number"
           value={age === "" ? "" : age.toString()}
-          onChange={(e) => setAge(e.target.value === "" ? "" : parseInt(e.target.value))}
+          onChange={(e) =>
+            setAge(e.target.value === "" ? "" : parseInt(e.target.value))
+          }
           placeholder="Age"
           required
         />
         <button type="submit">Submit</button>
-        {message && <p style={{ color: "green" }}>{message}</p>} {/* Prikaz poruke o uspehu */}
-        {error && <p style={{ color: "red" }}>{error}</p>} {/* Prikaz poruke o grešci */}
+        {message && <p style={{ color: "green" }}>{message}</p>}{" "}
+        {/* Prikaz poruke o uspehu */}
+        {error && <p style={{ color: "red" }}>{error}</p>}{" "}
+        {/* Prikaz poruke o grešci */}
       </form>
     </div>
   );

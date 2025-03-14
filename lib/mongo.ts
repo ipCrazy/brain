@@ -1,13 +1,13 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const MONGO_URI = process.env.MONGO_URI || ''; // Ensure this is defined in your .env file
+const MONGO_URI = process.env.MONGO_URI || ""; // Ensure this is defined in your .env file
 
 if (!MONGO_URI) {
-  throw new Error('MONGO_URI is not defined in the environment variables.');
+  throw new Error("MONGO_URI is not defined in the environment variables.");
 }
 
 // Enable Mongoose debugging (optional)
-mongoose.set('debug', true);
+mongoose.set("debug", true);
 
 // Cache the connection to avoid reconnecting unnecessarily
 let cachedConnection: typeof mongoose | null = null;
@@ -15,12 +15,12 @@ let cachedConnection: typeof mongoose | null = null;
 async function connectToDatabase() {
   // If a connection already exists and is connected, return it
   if (cachedConnection && mongoose.connection.readyState === 1) {
-    console.log('Using existing MongoDB connection');
+    console.log("Using existing MongoDB connection");
     return cachedConnection;
   }
 
   try {
-    console.log('Connecting to MongoDB...');
+    console.log("Connecting to MongoDB...");
 
     // Connect to MongoDB
     const connection = await mongoose.connect(MONGO_URI, {
@@ -29,13 +29,13 @@ async function connectToDatabase() {
       retryReads: true, // Enable retryable reads
     });
 
-    console.log('Successfully connected to MongoDB');
+    console.log("Successfully connected to MongoDB");
 
     // Cache the connection
     cachedConnection = connection;
     return connection;
   } catch (error) {
-    console.error('Failed to connect to MongoDB:', error);
+    console.error("Failed to connect to MongoDB:", error);
 
     // Clear the cached connection
     cachedConnection = null;
