@@ -1,40 +1,30 @@
-"use client";
-// Example: Fetching user data in a React component
-import { useEffect, useState } from "react";
+import { cookies } from "next/headers";
+import { verifyToken } from "@/utils/jwt";
+import { getUserById } from "@/models/User";
+import connectToDatabase from "@/lib/mongo";
+import DashboardComponent from "./Dashboard";
 
-interface User {
-  name: string;
-  email: string;
+async function getServerSideUser() {
+  await connectToDatabase();
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth-token")?.value;
+
+  if (!token) return null;
+  
+  const decoded = verifyToken(token);
+  if (!decoded) return null;
+
+  const user = await getUserById((decoded as { userId: string }).userId);
+  return user ? { name: user.name, email: user.email } : null;
 }
 
-export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data");
-        }
-        return response.json();
-      })
-      .then((data: User) => {
-        console.log("User data from API:", data); // Debug: Log the fetched user data
-        setUser(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error); // Debug: Log any errors
-      });
-  }, []);
+export default async function Dashboard() {
+  const user = await getServerSideUser();
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div>Нисам успео да учитам корисника</div>;
   }
 
-  return (
-    <div>
-      <h1>Welcome, {user.name}!</h1>
-      <p>Email: {user.email}</p>
-    </div>
-  );
+  return <DashboardComponent user={user} />;
 }
