@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { verifyToken } from "@/utils/jwt";
 import { getUserById } from "@/models/User";
 import connectToDatabase from "@/lib/mongo";
-import DashboardComponent from "./Dashboard";
+import DashboardComponent from "./components/Dashboard";
 
 async function getServerSideUser() {
   await connectToDatabase();
