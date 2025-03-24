@@ -11,7 +11,7 @@ async function getServerSideUser() {
   const token = cookieStore.get("auth-token")?.value;
 
   if (!token) return null;
-  
+
   const decoded = verifyToken(token);
   if (!decoded) return null;
 
