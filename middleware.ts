@@ -10,14 +10,14 @@ export default async function middleware(request: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth-token")?.value;
 
-  // Ako je ulogovan i ode na `/`, preusmeri ga na `/dashboard`
+  // Ako je ulogovan i ode na `/`, preusmeri ga na `/cerebro`
   if (token && pathname === "/") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/cerebro", request.url));
   }
 
-  // Ako je ulogovan i pokušava da pristupi public rutama (login/register), preusmeri na dashboard
+  // Ako je ulogovan i pokušava da pristupi public rutama (login/register), preusmeri na cerebro
   if (token && publicRoutes.includes(pathname)) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/cerebro", request.url));
   }
 
   // Ako nije ulogovan i pokušava da pristupi privatnim rutama, preusmeri ga na login
