@@ -26,7 +26,7 @@ export default function LoginForm() {
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        router.push("/dashboard");
+        router.push("/cerebro");
       } else {
         setError(data.error || "An error occurred");
       }
@@ -40,7 +40,7 @@ export default function LoginForm() {
       onSubmit={handleSubmit}
       className="bg-white p-6 rounded shadow-md w-96 space-y-4"
     >
-      <h1 className="text-2xl font-bold text-center">Login</h1>
+      <h1 className="text-2xl font-bold text-center text-gray-600">Login</h1>
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <input

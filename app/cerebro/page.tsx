@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { verifyToken } from "@/utils/jwt";
 import { getUserById } from "@/models/User";
 import connectToDatabase from "@/lib/mongo";
-import DashboardComponent from "./components/Dashboard";
+import Header from "./components/layout/Header";
 
 async function getServerSideUser() {
   await connectToDatabase();
@@ -26,5 +26,5 @@ export default async function Dashboard() {
     return <div>Нисам успео да учитам корисника</div>;
   }
 
-  return <DashboardComponent user={user} />;
+  return <Header user={user} />;
 }

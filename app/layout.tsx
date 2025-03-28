@@ -1,3 +1,4 @@
+import { ThemeProvider } from "../components/ThemeProvider";
 import "./globals.css";
 
 export default function RootLayout({
@@ -6,26 +7,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Inline skripta za postavljanje dark mode-a pre hidracije */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  const darkModeOn = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (darkModeOn) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
+        {/* You can still leave your existing head logic or metadata here */}
       </head>
-      <body className="bg-white text-black dark:bg-gray-900 dark:text-white">
-        {children}
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
