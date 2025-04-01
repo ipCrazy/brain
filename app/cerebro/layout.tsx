@@ -8,11 +8,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white dark:bg-neutral-800 flex flex-row h-screen">
+    <div className="bg-white dark:bg-neutral-800 flex flex-row h-screen relative overflow-hidden">
       <SidebarProvider>
         <AppSidebar />
-        <main className="w-full">
-          <div className="bg-neutral-700 flex justify-between items-center flex-row m-2.5 h-10 grow">
+        <main className="w-full relative">
+          <div className="flex justify-between items-center w-full overflow-hidden absolute bg-transparent">
             <SidebarTrigger />
             <MainHeader />
           </div>
