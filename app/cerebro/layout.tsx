@@ -1,6 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "./components/layout/AppSidebar";
 import MainHeader from "./components/layout/MainHeader";
+import AppContentWrapper from "./components/layout/AppContentWrapper";
 
 export default function DashboardLayout({
   children,
@@ -12,11 +13,11 @@ export default function DashboardLayout({
       <SidebarProvider>
         <AppSidebar />
         <main className="w-full relative">
-          <div className="flex justify-between items-center w-full overflow-hidden absolute bg-transparent">
+          <div className="flex justify-between items-center w-full overflow-hidden absolute bg-transparent z-50">
             <SidebarTrigger />
             <MainHeader />
           </div>
-          {children}
+          <AppContentWrapper>{children}</AppContentWrapper>
         </main>
       </SidebarProvider>
     </div>
