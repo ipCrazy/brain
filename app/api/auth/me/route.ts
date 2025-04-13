@@ -16,6 +16,8 @@ export async function GET() {
   if (!decoded) return NextResponse.json({ user: null }, { status: 401 });
 
   const user = await getUserById((decoded as { userId: string }).userId);
-  
-  return NextResponse.json(user ? { user } : { user: null }, { status: user ? 200 : 401 });
+
+  return NextResponse.json(user ? { user } : { user: null }, {
+    status: user ? 200 : 401,
+  });
 }

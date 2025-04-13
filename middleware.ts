@@ -7,8 +7,7 @@ export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Proveri da li je korisnik ulogovan (asinhrono dohvatanje cookies)
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
+  const token = request.cookies.get("auth-token")?.value;
 
   // Ako je ulogovan i ode na `/`, preusmeri ga na `/cerebro`
   if (token && pathname === "/") {
