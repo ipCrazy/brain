@@ -1,4 +1,6 @@
 import { ThemeProvider } from "../components/ThemeProvider";
+import { SessionProvider } from "../components/SessionProvider";
+
 import "./globals.css";
 
 export default function RootLayout({
@@ -18,7 +20,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <SessionProvider>{children}</SessionProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,7 +1,8 @@
+// /app/api/me/route.ts
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 import { verifyToken } from "@/utils/jwt";
 import { getUserById } from "@/models/User";
+import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongo";
 
 export async function GET() {

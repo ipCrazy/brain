@@ -32,15 +32,32 @@ export default function AppInput() {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault(); // Sprečava ponovno učitavanje stranice
-    console.log("Message Sent:", message);
-    setMessage(""); // Resetuje sadržaj poruke
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    console.log();
+    if (!message.trim()) return;
 
-    // Resetovanje visine textarea
+    try {
+      const res = await fetch("/api/memory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: message.trim() }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        console.error("Greška:", data.error);
+      } else {
+        console.log("Uspešno snimljeno!");
+      }
+    } catch (err) {
+      console.error("Fetch greška:", err);
+    }
+
+    setMessage("");
     if (inputRef.current) {
-      inputRef.current.style.height = "44px"; // Resetuje visinu textarea
-      inputRef.current.blur(); // Uklanja fokus sa textarea i zatvara tastaturu
+      inputRef.current.style.height = "44px";
+      inputRef.current.blur();
     }
   };
 
@@ -48,7 +65,7 @@ export default function AppInput() {
     return null;
   }
   return (
-    <div className="fixed bottom-0 w-full pb-4">
+    <div className="pb-4 w-full">
       <div
         className="flex w-full flex-col items-center justify-center max-w-3xl mx-auto cursor-text px-4"
         onClick={() => inputRef.current?.focus()}

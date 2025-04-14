@@ -1,41 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import clientPromise from "@/lib/mongo"; // tvoja konekcija
-import { getServerSession } from "next-auth"; // ako koristiš auth
-import { authOptions } from "@/lib/auth"; // tvoj auth setup
+import { cookies } from "next/headers";
+import connectToDatabase from "@/lib/mongo";
+import { verifyToken } from "@/utils/jwt";
+import UserMemory from "@/models/UserMemory";
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
+  await connectToDatabase();
 
-  if (!session || !session.user?.email) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth-token")?.value;
+
+  if (!token)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const decoded = verifyToken(token);
+  if (!decoded)
+    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+
+  const { userId } = decoded as { userId: string };
+
+  const { text } = await req.json();
+  if (!text || typeof text !== "string") {
+    return NextResponse.json({ error: "Text is required" }, { status: 400 });
   }
 
-  try {
-    const { text } = await req.json();
+  const newMemory = new UserMemory({
+    userId,
+    content: text,
+  });
 
-    if (!text || typeof text !== "string") {
-      return NextResponse.json(
-        { error: "Invalid text input" },
-        { status: 400 }
-      );
-    }
+  await newMemory.save();
 
-    const client = await clientPromise;
-    const db = client.db(); // koristi bazu iz URI-ja (npr. TESTIRAMO)
-    const collection = db.collection("memories");
-
-    const result = await collection.insertOne({
-      userId: session.user.email,
-      text,
-      createdAt: new Date(),
-    });
-
-    return NextResponse.json({ success: true, id: result.insertedId });
-  } catch (error) {
-    console.error("Error inserting memory:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({ success: true });
 }
