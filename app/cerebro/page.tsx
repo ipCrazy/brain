@@ -1,7 +1,9 @@
-export default async function Dashboard() {
+import MemoryFeed from "./components/ux/MemoryFeed";
+
+export default async function Hippocampus() {
   return (
-    <div className="flex-1 overflow-hidden flex flex-col items-center justify-center">
-      <h1>Hi</h1>
+    <div className="w-full overflow-hidden flex flex-col items-center">
+      <MemoryFeed />
     </div>
   );
 }

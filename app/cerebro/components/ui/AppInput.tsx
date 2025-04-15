@@ -2,13 +2,15 @@
 
 import { useRef, useState } from "react";
 import { LuBrainCircuit } from "react-icons/lu";
-
 import { usePathname } from "next/navigation";
+import { useMemoryStore } from "../../stores/memoryStore";
 
 export default function AppInput() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [message, setMessage] = useState("");
   const pathname = usePathname();
+  const { triggerRefetch } = useMemoryStore();
+
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = event.target;
     setMessage(textarea.value);
@@ -16,25 +18,21 @@ export default function AppInput() {
     textarea.style.height = "44px";
 
     const maxHeight = 300;
-
     if (textarea.scrollHeight > textarea.clientHeight) {
-      const newHeight = Math.min(textarea.scrollHeight, maxHeight);
-      textarea.style.height = `${newHeight}px`;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
     }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      if (inputRef.current) {
-        inputRef.current.form?.requestSubmit();
-      }
+      inputRef.current?.form?.requestSubmit();
     }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log();
+
     if (!message.trim()) return;
 
     try {
@@ -44,11 +42,11 @@ export default function AppInput() {
         body: JSON.stringify({ text: message.trim() }),
       });
 
-      if (!res.ok) {
+      if (res.ok) {
+        triggerRefetch(); // 🔁 Trigeruj MemoryFeed da se osveži
+      } else {
         const data = await res.json();
         console.error("Greška:", data.error);
-      } else {
-        console.log("Uspešno snimljeno!");
       }
     } catch (err) {
       console.error("Fetch greška:", err);
@@ -61,11 +59,10 @@ export default function AppInput() {
     }
   };
 
-  if (pathname === "/cerebro/settings") {
-    return null;
-  }
+  if (pathname === "/cerebro/settings") return null;
+
   return (
-    <div className="pb-4 w-full">
+    <div className="pb-4 w-full bg-green-600 fixed bottom-0 z-10 isolate">
       <div
         className="flex w-full flex-col items-center justify-center max-w-3xl mx-auto cursor-text px-4"
         onClick={() => inputRef.current?.focus()}

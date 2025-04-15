@@ -33,3 +33,33 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
+
+export async function GET(req: NextRequest) {
+  await connectToDatabase();
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth-token")?.value;
+  if (!token)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const decoded = verifyToken(token);
+  if (!decoded)
+    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+
+  const { userId } = decoded as { userId: string };
+
+  const dateParam = req.nextUrl.searchParams.get("date");
+  if (!dateParam)
+    return NextResponse.json({ error: "Date is required" }, { status: 400 });
+
+  // Normalize date
+  const startOfDay = new Date(dateParam + "T00:00:00.000Z");
+  const endOfDay = new Date(dateParam + "T23:59:59.999Z");
+
+  const memories = await UserMemory.find({
+    userId,
+    createdAt: { $gte: startOfDay, $lte: endOfDay },
+  }).sort({ createdAt: 1 });
+
+  return NextResponse.json({ memories });
+}
