@@ -1,9 +1,9 @@
-import MemoryFeed from "./components/ux/MemoryFeed";
+import ServerMemoryFeed from "@/components/ux/ServerMemoryFeed";
 
-export default async function Hippocampus() {
+export default function Hippocampus() {
   return (
-    <div className="w-full overflow-hidden flex flex-col items-center">
-      <MemoryFeed />
+    <div className="flex-1 w-full overflow-hidden">
+      <ServerMemoryFeed />
     </div>
   );
 }

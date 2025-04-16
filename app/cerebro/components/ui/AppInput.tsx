@@ -14,7 +14,6 @@ export default function AppInput() {
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = event.target;
     setMessage(textarea.value);
-
     textarea.style.height = "44px";
 
     const maxHeight = 300;
@@ -43,7 +42,7 @@ export default function AppInput() {
       });
 
       if (res.ok) {
-        triggerRefetch(); // 🔁 Trigeruj MemoryFeed da se osveži
+        triggerRefetch();
       } else {
         const data = await res.json();
         console.error("Greška:", data.error);
@@ -62,7 +61,7 @@ export default function AppInput() {
   if (pathname === "/cerebro/settings") return null;
 
   return (
-    <div className="pb-4 w-full bg-green-600 fixed bottom-0 z-10 isolate">
+    <div className="w-full">
       <div
         className="flex w-full flex-col items-center justify-center max-w-3xl mx-auto cursor-text px-4"
         onClick={() => inputRef.current?.focus()}

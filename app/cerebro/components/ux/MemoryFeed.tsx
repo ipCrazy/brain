@@ -1,25 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMemoryStore } from "../../stores/memoryStore";
-import { useUserSession } from "@/components/SessionProvider";
 
-export default function MemoryFeed() {
-  const { user } = useUserSession();
-  const [memories, setMemories] = useState([]);
+type Memory = { _id: string; content: string };
+
+export default function MemoryFeed({
+  initialMemories,
+}: {
+  initialMemories: Memory[];
+}) {
+  const [memories, setMemories] = useState(initialMemories);
   const { shouldRefetch, clearRefetch } = useMemoryStore();
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const fetchMemories = async () => {
-    if (!user) return;
     const today = new Date().toISOString().split("T")[0];
     const res = await fetch(`/api/memory?date=${today}`);
     const data = await res.json();
     setMemories(data.memories);
   };
-
-  useEffect(() => {
-    fetchMemories();
-  }, [user]);
 
   useEffect(() => {
     if (shouldRefetch) {
@@ -28,16 +28,23 @@ export default function MemoryFeed() {
     }
   }, [shouldRefetch]);
 
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [memories]);
+
   return (
-    <div
-      className="bg-blue-300 flex flex-col w-full max-w-3xl gap-3 overflow-y-auto pr-2"
-      style={{ maxHeight: "calc(100vh - 140px)" }} // prilagodi visinu inputa
-    >
-      {memories.map((m: any) => (
-        <div key={m._id} className="bg-white/10 p-3 rounded-xl text-white">
-          <p>{m.content}</p>
+    <div className="flex flex-col gap-3">
+      {memories.map((m) => (
+        <div key={m._id} className=" p-3 rounded-xl text-white">
+          <p className="break-words break-word w-full text-pre-wrap">
+            {m.content}
+          </p>
+          <hr className="my-2 border-gray-500" />
         </div>
       ))}
+      <div ref={bottomRef} />
     </div>
   );
 }
