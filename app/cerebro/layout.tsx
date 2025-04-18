@@ -13,7 +13,12 @@ export default function DashboardLayout({
       <SidebarProvider>
         <AppSidebar />
         <main className="w-full relative">
-          <div className="flex justify-between items-center w-full overflow-hidden absolute bg-transparent z-50">
+          <div
+            className="absolute top-0 left-0 right-0 z-20 h-16 font-semibold
+             pointer-events-none select-none
+             flex items-center justify-between p-3
+             *:pointer-events-auto max-md:hidden"
+          >
             <SidebarTrigger />
             <MainHeader />
           </div>

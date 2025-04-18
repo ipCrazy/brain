@@ -63,3 +63,69 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ memories });
 }
+
+export async function PUT(req: NextRequest) {
+  await connectToDatabase();
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth-token")?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  }
+
+  const { userId } = decoded as { userId: string };
+  const { id, text } = await req.json();
+
+  if (!id || !text) {
+    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  }
+
+  const memory = await UserMemory.findOneAndUpdate(
+    { _id: id, userId },
+    { content: text },
+    { new: true }
+  );
+
+  if (!memory) {
+    return NextResponse.json({ error: "Memory not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ success: true, memory });
+}
+
+export async function DELETE(req: NextRequest) {
+  await connectToDatabase();
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth-token")?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  }
+
+  const { userId } = decoded as { userId: string };
+  const { id } = await req.json();
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing memory ID" }, { status: 400 });
+  }
+
+  const result = await UserMemory.findOneAndDelete({ _id: id, userId });
+
+  if (!result) {
+    return NextResponse.json({ error: "Memory not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({ success: true });
+}
