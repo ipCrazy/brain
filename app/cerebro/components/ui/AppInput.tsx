@@ -8,6 +8,7 @@ import { useMemoryStore } from "../../stores/memoryStore";
 export default function AppInput() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const pathname = usePathname();
   const { triggerRefetch } = useMemoryStore();
 
@@ -23,7 +24,7 @@ export default function AppInput() {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && !event.shiftKey) {
+    if (event.key === "Enter" && !event.shiftKey && !isSubmitting) {
       event.preventDefault();
       inputRef.current?.form?.requestSubmit();
     }
@@ -32,7 +33,9 @@ export default function AppInput() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!message.trim()) return;
+    if (!message.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
 
     try {
       const res = await fetch("/api/memory", {
@@ -49,6 +52,8 @@ export default function AppInput() {
       }
     } catch (err) {
       console.error("Fetch greška:", err);
+    } finally {
+      setIsSubmitting(false);
     }
 
     setMessage("");
@@ -77,6 +82,7 @@ export default function AppInput() {
             onKeyDown={handleKeyDown}
             placeholder="Enter your message"
             rows={1}
+            disabled={isSubmitting}
             className="bg-transparent text-white placeholder:text-gray-400 px-3 py-2 outline-none w-full resize-none overflow-auto"
             style={{
               minHeight: "44px",
@@ -93,13 +99,16 @@ export default function AppInput() {
             </div>
             <button
               type="submit"
+              disabled={!message.trim() || isSubmitting}
               className={`rounded-full transition h-11 w-11 mr-1 flex items-center justify-center ${
-                message
+                message.trim() && !isSubmitting
                   ? "bg-black/40 hover:bg-black/60"
                   : "bg-gray-500 cursor-not-allowed"
               }`}
-              disabled={!message}
-              style={{ pointerEvents: message ? "auto" : "none" }}
+              style={{
+                pointerEvents:
+                  message.trim() && !isSubmitting ? "auto" : "none",
+              }}
             >
               <LuBrainCircuit className="text-white text-xl" />
             </button>

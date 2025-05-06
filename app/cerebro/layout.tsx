@@ -15,9 +15,9 @@ export default function DashboardLayout({
         <main className="w-full relative">
           <div
             className="absolute top-0 left-0 right-0 z-20 h-16 font-semibold
-             pointer-events-none select-none
-             flex items-center justify-between p-3
-             *:pointer-events-auto max-md:hidden"
+            pointer-events-none select-none
+            flex items-center justify-between p-3
+            *:pointer-events-auto"
           >
             <SidebarTrigger />
             <MainHeader />

@@ -10,7 +10,7 @@ export default function AppContentWrapper({
   return (
     <div className="flex flex-col h-screen w-full relative">
       {/* Scrollable zona */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent pt-16 xl-min:pt-0">
         <div className="max-w-3xl mx-auto w-full px-4 py-6">{children}</div>
       </div>
 
