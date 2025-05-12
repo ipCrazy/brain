@@ -4,7 +4,7 @@ import MemoryFeed from "../../app/cerebro/components/ux/MemoryFeed";
 
 export default async function ServerMemoryFeed() {
   const userId = await getUserFromCookies();
-  if (!userId) return <div className="text-white">Nema korisnika</div>;
+  if (!userId) return <div>Nema korisnika</div>;
 
   const memories = await getTodayMemoriesForUser(userId);
   // Convert MongoDB objects to plain JavaScript objects

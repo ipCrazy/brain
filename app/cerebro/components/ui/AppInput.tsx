@@ -66,9 +66,9 @@ export default function AppInput() {
   if (pathname === "/cerebro/settings") return null;
 
   return (
-    <div className="w-full">
+    <div className="w-full ">
       <div
-        className="flex w-full flex-col items-center justify-center max-w-3xl mx-auto cursor-text px-4"
+        className="flex w-full flex-col items-center justify-center max-w-3xl mx-auto cursor-text  px-0 sm:px-4"
         onClick={() => inputRef.current?.focus()}
       >
         <form
@@ -83,7 +83,7 @@ export default function AppInput() {
             placeholder="Enter your message"
             rows={1}
             disabled={isSubmitting}
-            className="bg-transparent text-white placeholder:text-gray-400 px-3 py-2 outline-none w-full resize-none overflow-auto"
+            className="bg-transparent placeholder:text-gray-400 px-3 py-2 outline-none w-full resize-none overflow-auto"
             style={{
               minHeight: "44px",
               maxHeight: "300px",
@@ -110,7 +110,7 @@ export default function AppInput() {
                   message.trim() && !isSubmitting ? "auto" : "none",
               }}
             >
-              <LuBrainCircuit className="text-white text-xl" />
+              <LuBrainCircuit className="text-xl" />
             </button>
           </div>
         </form>

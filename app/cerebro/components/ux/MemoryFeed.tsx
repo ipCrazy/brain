@@ -19,8 +19,12 @@ export default function MemoryFeed({
   const [memories, setMemories] = useState<Memory[]>(initialMemories);
   const [openedCardId, setOpenedCardId] = useState<string | null>(null);
   const { shouldRefetch, clearRefetch } = useMemoryStore();
+
   const feedRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 👇 Dodato: Ref na poslednju memoriju
+  const lastMemoryRef = useRef<HTMLDivElement | null>(null);
 
   const fetchMemories = async () => {
     const today = new Date().toISOString().split("T")[0];
@@ -47,7 +51,14 @@ export default function MemoryFeed({
     fetchMemories();
   };
 
-  // Click outside to close
+  // 👇 Dodato: Automatski scroll na poslednju memoriju kada se lista ažurira
+  useEffect(() => {
+    if (lastMemoryRef.current) {
+      lastMemoryRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [memories]);
+
+  // Click outside da zatvori otvorenu karticu
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -63,13 +74,13 @@ export default function MemoryFeed({
     return () => document.removeEventListener("click", handleClickOutside);
   }, [openedCardId]);
 
-  // Auto-close after 10 seconds
+  // Auto zatvaranje nakon 10 sekundi
   useEffect(() => {
     if (openedCardId) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => {
         setOpenedCardId(null);
-      }, 10000); // 10 sekundi
+      }, 10000);
     }
 
     return () => {
@@ -77,6 +88,7 @@ export default function MemoryFeed({
     };
   }, [openedCardId]);
 
+  // Re-fetch memorija ako je zatraženo
   useEffect(() => {
     if (shouldRefetch) {
       fetchMemories();
@@ -86,18 +98,22 @@ export default function MemoryFeed({
 
   return (
     <div className="flex flex-col gap-3" ref={feedRef}>
-      {memories.map((m) => (
-        <MemoryCard
-          key={m._id}
-          memory={m}
-          onDelete={handleDelete}
-          onUpdate={handleUpdate}
-          isOpen={openedCardId === m._id}
-          onToggle={() =>
-            setOpenedCardId((prev) => (prev === m._id ? null : m._id))
-          }
-        />
-      ))}
+      {memories.map((m, index) => {
+        const isLast = index === memories.length - 1;
+        return (
+          <div key={m._id} ref={isLast ? lastMemoryRef : null}>
+            <MemoryCard
+              memory={m}
+              onDelete={handleDelete}
+              onUpdate={handleUpdate}
+              isOpen={openedCardId === m._id}
+              onToggle={() =>
+                setOpenedCardId((prev) => (prev === m._id ? null : m._id))
+              }
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }

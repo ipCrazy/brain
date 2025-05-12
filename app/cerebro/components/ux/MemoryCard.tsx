@@ -48,12 +48,12 @@ export default function MemoryCard({
   return (
     <div
       onClick={() => !isEditing && onToggle()}
-      className="bg-white/10 p-4 rounded-xl text-white relative cursor-pointer transition duration-200 active:scale-[0.99]"
+      className="bg-white/10 p-4 rounded-xl  relative cursor-pointer transition duration-200 active:scale-[0.99]"
     >
       {isEditing ? (
         <>
           <textarea
-            className="w-full bg-transparent border border-gray-500 p-2 rounded text-white resize-none"
+            className="w-full bg-transparent border border-gray-500 p-2 rounded  resize-none"
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
             rows={3}
