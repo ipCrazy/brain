@@ -97,7 +97,7 @@ export default function MemoryFeed({
   }, [shouldRefetch]);
 
   return (
-    <div className="flex flex-col gap-3" ref={feedRef}>
+    <div className="flex  flex-col" ref={feedRef}>
       {memories.map((m, index) => {
         const isLast = index === memories.length - 1;
         return (
@@ -110,6 +110,7 @@ export default function MemoryFeed({
               onToggle={() =>
                 setOpenedCardId((prev) => (prev === m._id ? null : m._id))
               }
+              isFirst={index === 0}
             />
           </div>
         );

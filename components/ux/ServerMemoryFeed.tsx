@@ -1,18 +1,19 @@
-import { getUserFromCookies } from "@/lib/auth";
+// components/ServerMemoryFeed.tsx
+import { getFullUserFromCookies } from "@/lib/auth";
 import { getTodayMemoriesForUser } from "@/lib/db/fetchMemories";
 import MemoryFeed from "../../app/cerebro/components/ux/MemoryFeed";
 
 export default async function ServerMemoryFeed() {
-  const userId = await getUserFromCookies();
-  if (!userId) return <div>Nema korisnika</div>;
+  const user = await getFullUserFromCookies();
+  if (!user) return <div>Nema korisnika</div>;
 
-  const memories = await getTodayMemoriesForUser(userId);
-  // Convert MongoDB objects to plain JavaScript objects
+  const memories = await getTodayMemoriesForUser(user._id.toString());
+
   const serializedMemories = memories.map((memory) => ({
     ...memory,
-    _id: memory._id.toString(), // Convert ObjectId to string
-    userId: memory.userId ? memory.userId.toString() : null, // Assuming userId might also be an ObjectId
-    // Add any other complex object conversions here
+    _id: memory._id.toString(),
+    userId: memory.userId?.toString() ?? null,
+    updatedAt: memory.updatedAt?.toString() ?? "",
   }));
 
   return <MemoryFeed initialMemories={serializedMemories} />;
