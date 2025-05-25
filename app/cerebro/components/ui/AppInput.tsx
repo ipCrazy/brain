@@ -1,16 +1,33 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { LuBrainCircuit } from "react-icons/lu";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useMemoryStore } from "../../stores/memoryStore";
 
 export default function AppInput() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { triggerRefetch } = useMemoryStore();
+
+  // Detekcija klika van menija za zatvaranje
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = event.target;
@@ -63,12 +80,17 @@ export default function AppInput() {
     }
   };
 
-  if (pathname === "/cerebro/settings") return null;
+  if (
+    pathname === "/cerebro/settings" ||
+    pathname === "/cerebro/person" ||
+    pathname === "/cerebro/person/new"
+  )
+    return null;
 
   return (
-    <div className="w-full ">
+    <div className="w-full">
       <div
-        className="flex w-full flex-col items-center justify-center max-w-3xl mx-auto cursor-text  px-0 sm:px-4"
+        className="flex w-full flex-col items-center justify-center max-w-3xl mx-auto cursor-text px-0 sm:px-4"
         onClick={() => inputRef.current?.focus()}
       >
         <form
@@ -93,7 +115,29 @@ export default function AppInput() {
 
           <div className="flex w-full flex-row items-center justify-between mt-2">
             <div className="flex flex-row items-center gap-3 pl-1">
-              <p>icon1</p>
+              <div className="relative" ref={menuRef}>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((prev) => !prev)}
+                  className="text-2xl text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+                >
+                  +
+                </button>
+                {menuOpen && (
+                  <div className="absolute bottom-full left-0 mb-2 w-36 bg-white dark:bg-neutral-700 border dark:border-neutral-500 rounded-md shadow-lg z-50">
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false);
+                        router.push("/cerebro/person/new");
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                    >
+                      ➕ Add Person
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <p>icon2</p>
               <p>icon3</p>
             </div>
