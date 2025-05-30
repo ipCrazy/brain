@@ -3,8 +3,8 @@ import { Schema, model, models } from "mongoose";
 const PersonSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    name: { type: String },
-    surname: { type: String },
+    name: { type: String, required: true }, // Dodao required: true za ime
+    surname: { type: String, required: true }, // Dodao required: true za prezime
     nickname: { type: String },
     age: { type: Number },
     email: { type: String },
@@ -15,11 +15,15 @@ const PersonSchema = new Schema(
     company: { type: String },
     relationship: { type: String },
     notes: { type: String },
-    customFields: { type: Map, of: Schema.Types.Mixed },
+    customFields: {
+      type: Map,
+      of: String,
+      default: {},
+    },
   },
   {
     timestamps: true,
-    collection: "person", // Eksplicitno navodi naziv kolekcije
+    collection: "person",
   }
 );
 

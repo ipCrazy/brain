@@ -27,6 +27,19 @@ export default function NewPersonPage() {
     notes: "",
   });
 
+  function normalizeKey(input: string): string {
+    if (!input) return "";
+
+    // Ukloni praznine sa početka i kraja
+    let trimmed = input.trim();
+
+    // Zameni sve uzastopne razmake sa jednim razmakom
+    // Regex: \s+ znači jedan ili više whitespace karaktera
+    trimmed = trimmed.replace(/\s+/g, " ");
+
+    return trimmed;
+  }
+
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
 
   const handleInputChange = (
@@ -57,9 +70,15 @@ export default function NewPersonPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const customObject = Object.fromEntries(
+      customFields
+        .filter((f) => f.key.trim() !== "") // filtiraj prazne ključeve
+        .map(({ key, value }) => [normalizeKey(key), value]) // normalizuj ključeve
+    );
+
     const payload = {
       ...formData,
-      customFields: customFields.filter((f) => f.key.trim() !== ""),
+      customFields: customObject,
     };
 
     try {
@@ -72,7 +91,14 @@ export default function NewPersonPage() {
       if (res.ok) {
         router.push("/cerebro/person");
       } else {
-        console.error("Greška prilikom slanja:", await res.json());
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await res.json();
+          console.error("Greška prilikom slanja:", errorData);
+        } else {
+          const errorText = await res.text();
+          console.error("Greška prilikom slanja:", errorText);
+        }
       }
     } catch (err) {
       console.error("Greška:", err);
@@ -116,7 +142,7 @@ export default function NewPersonPage() {
                   onChange={(e) =>
                     handleCustomChange(index, "key", e.target.value)
                   }
-                  className="peer w-full px-3 pt-5 pb-2 border rounded-md  dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                  className="peer w-full px-3 pt-5 pb-2 border rounded-md dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                   autoComplete="off"
                 />
                 <label className="absolute left-3 top-2 text-sm text-gray-500 dark:text-gray-400 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-black dark:peer-focus:text-white">
@@ -132,7 +158,7 @@ export default function NewPersonPage() {
                   onChange={(e) =>
                     handleCustomChange(index, "value", e.target.value)
                   }
-                  className="peer w-full px-3 pt-5 pb-2 border rounded-md  dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+                  className="peer w-full px-3 pt-5 pb-2 border rounded-md dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
                   autoComplete="off"
                 />
                 <label className="absolute left-3 top-2 text-sm text-gray-500 dark:text-gray-400 transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-black dark:peer-focus:text-white">
@@ -170,7 +196,7 @@ export default function NewPersonPage() {
   );
 }
 
-// 🧩 Floating Label Input
+// FloatingInput component
 function FloatingInput({
   name,
   label,

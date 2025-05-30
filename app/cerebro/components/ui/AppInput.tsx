@@ -79,13 +79,7 @@ export default function AppInput() {
       inputRef.current.blur();
     }
   };
-
-  if (
-    pathname === "/cerebro/settings" ||
-    pathname === "/cerebro/person" ||
-    pathname === "/cerebro/person/new"
-  )
-    return null;
+  if (pathname.startsWith("/cerebro/")) return null;
 
   return (
     <div className="w-full">
