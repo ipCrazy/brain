@@ -1,6 +1,8 @@
-"use client";
+// components/MemoryCard.tsx
+'use client';
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from 'react';
+import FormattedDate from '@/components/FormattedDate';
 
 type Memory = {
   _id: string;
@@ -27,39 +29,13 @@ export default function MemoryCard({
   isFirst,
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedContent, setEditedContent] = useState<string>("");
-  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [editedContent, setEditedContent] = useState('');
 
-  // Sync edited content when memory changes
   useEffect(() => {
     if (memory?.content) {
       setEditedContent(memory.content);
     }
   }, [memory]);
-
-  // Auto-hide buttons 10s after opening
-  useEffect(() => {
-    if (isOpen) {
-      // clear any existing timer
-      if (hideTimer.current) clearTimeout(hideTimer.current);
-      hideTimer.current = setTimeout(() => {
-        onToggle();
-      }, 10000);
-    } else {
-      // clear timer if closed manually
-      if (hideTimer.current) {
-        clearTimeout(hideTimer.current);
-        hideTimer.current = null;
-      }
-    }
-
-    return () => {
-      if (hideTimer.current) {
-        clearTimeout(hideTimer.current);
-        hideTimer.current = null;
-      }
-    };
-  }, [isOpen, onToggle]);
 
   const handleSave = () => {
     const trimmed = editedContent.trim();
@@ -72,7 +48,7 @@ export default function MemoryCard({
   };
 
   const handleDelete = () => {
-    if (confirm("Are you sure that you want to delete this memory?")) {
+    if (confirm('Are you sure that you want to delete this memory?')) {
       onDelete(memory._id);
     }
   };
@@ -118,21 +94,13 @@ export default function MemoryCard({
 
           <div className="mt-2 text-sm text-gray-400">
             <div>
-              Date:{" "}
-              {new Date(memory.createdAt).toLocaleString("sr-RS", {
-                dateStyle: "short",
-                timeStyle: "short",
-              })}
+              Date: <FormattedDate timestamp={memory.createdAt} />
             </div>
             {memory.updatedAt !== memory.createdAt &&
               new Date(memory.updatedAt).getTime() !==
                 new Date(memory.createdAt).getTime() && (
                 <div>
-                  Edited:{" "}
-                  {new Date(memory.updatedAt).toLocaleString("sr-RS", {
-                    dateStyle: "short",
-                    timeStyle: "short",
-                  })}
+                  Edited: <FormattedDate timestamp={memory.updatedAt} />
                 </div>
               )}
           </div>
@@ -140,8 +108,8 @@ export default function MemoryCard({
           <div
             className={`mt-3 flex gap-4 transition-opacity duration-300 ${
               isOpen
-                ? "opacity-100 pointer-events-auto"
-                : "opacity-0 pointer-events-none"
+                ? 'opacity-100 pointer-events-auto'
+                : 'opacity-0 pointer-events-none'
             }`}
           >
             <button
