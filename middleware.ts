@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { cookies } from "next/headers";
 import { publicRoutes } from "./config/routes";
 
 export default async function middleware(request: NextRequest) {

@@ -1,75 +1,74 @@
-import { NextResponse } from "next/server";
-import UserModel from "@/models/User";
-import connectToDatabase from "@/lib/mongo";
-import { z } from "zod";
-import UserMemory from "@/models/UserMemory"; // Import modela
+// app/api/register/route.ts
 
-const userSchema = z.object({
-  name: z.string().min(3),
-  email: z.string().email(),
-  password: z
-    .string()
-    .min(8)
-    .regex(/[A-Z]/)
-    .regex(/[0-9]/)
-    .regex(/[^a-zA-Z0-9]/),
-  confirmPassword: z.string(),
-});
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import bcrypt from 'bcryptjs';
+import connectToDatabase from '@/lib/mongo';
+import UserModel from '@/models/User';
+import UserMemory from '@/models/UserMemory';
+
+const userSchema = z
+  .object({
+    name: z.string().min(3, 'Ime mora imati najmanje 3 karaktera'),
+    email: z.string().email('Nevažeća email adresa'),
+    password: z
+      .string()
+      .min(8, 'Lozinka mora imati najmanje 8 karaktera')
+      .regex(/[A-Z]/, 'Lozinka mora sadržati najmanje jedno veliko slovo')
+      .regex(/[0-9]/, 'Lozinka mora sadržati najmanje jedan broj')
+      .regex(/[^a-zA-Z0-9]/, 'Lozinka mora sadržati najmanje jedan specijalni karakter'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Lozinke se ne poklapaju',
+    path: ['confirmPassword'],
+  });
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Proverava da li se lozinke poklapaju
-    if (body.password !== body.confirmPassword) {
-      return NextResponse.json(
-        { error: "Passwords do not match" },
-        { status: 400 }
-      );
-    }
-
     // Validacija ulaznih podataka
-    const validation = userSchema.safeParse(body);
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: validation.error.errors[0].message },
-        { status: 400 }
-      );
+    const result = userSchema.safeParse(body);
+    if (!result.success) {
+      const errorMessage = result.error.errors[0]?.message || 'Nevažeći podaci';
+      return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
-    await connectToDatabase(); // Povezivanje sa bazom
+    const { name, email, password } = result.data;
 
-    // Proverava da li već postoji korisnik sa istim emailom
-    const existingUser = await UserModel.findOne({ email: body.email });
+    // Povezivanje sa bazom
+    await connectToDatabase();
+
+    // Provera da li korisnik već postoji
+    const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      return NextResponse.json(
-        { error: "User already exists" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Korisnik već postoji' }, { status: 400 });
     }
 
-    // Kreira novog korisnika
+    // Hesiranje lozinke
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Kreiranje novog korisnika
     const newUser = new UserModel({
-      name: body.name,
-      email: body.email,
-      password: body.password,
+      name,
+      email,
+      password: hashedPassword,
     });
 
-    await newUser.save(); // Spasi novog korisnika u bazu
+    await newUser.save();
 
-    // Dodaj prvu memoriju u `user_memory` kolekciju
+    // Dodavanje prve memorije korisniku
     const newMemory = new UserMemory({
-      userId: newUser._id, // ID korisnika
-      content: "Dobrodošli! Ovo je vaša prva memorija.", // Prva memorija
+      userId: newUser._id,
+      content: 'Dobrodošli! Ovo je vaša prva memorija.',
     });
 
-    await newMemory.save(); // Spasi memoriju u bazu
+    await newMemory.save();
 
-    return NextResponse.json(
-      { message: "Registration successful" },
-      { status: 201 }
-    );
+    return NextResponse.json({ message: 'Registracija uspešna' }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.error('Greška prilikom registracije:', error);
+    return NextResponse.json({ error: 'Greška na serveru' }, { status: 500 });
   }
 }

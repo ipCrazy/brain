@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import { LuBrainCircuit } from "react-icons/lu";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemoryStore } from "../../stores/memoryStore";
+import { PlusIcon } from "@heroicons/react/24/outline"; // Važno: Putanja je '/24/outline'
 
 export default function AppInput() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -108,14 +109,16 @@ export default function AppInput() {
           />
 
           <div className="flex w-full flex-row items-center justify-between mt-2">
-            <div className="flex flex-row items-center gap-3 pl-1">
+            <div className="flex flex-row items-center justi gap-3 pl-1">
               <div className="relative" ref={menuRef}>
                 <button
                   type="button"
                   onClick={() => setMenuOpen((prev) => !prev)}
-                  className="text-2xl text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
+                  className="text-2xl leading-none text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full w-10 h-10 flex items-center justify-center transition-colors"
                 >
-                  +
+                  {/* Ovde je bio '+' */}
+                  <PlusIcon className="h-6 w-6" />{" "}
+                  {/* Dodaj PlusIcon sa Tailwind klasama za veličinu */}
                 </button>
                 {menuOpen && (
                   <div className="absolute bottom-full left-0 mb-2 w-36 bg-white dark:bg-neutral-700 border dark:border-neutral-500 rounded-md shadow-lg z-50">
@@ -124,9 +127,11 @@ export default function AppInput() {
                         setMenuOpen(false);
                         router.push("/cerebro/person/new");
                       }}
-                      className="w-full text-left px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                      className="w-full text-left px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-600 flex items-center gap-2 text-sm"
                     >
-                      ➕ Add Person
+                      <PlusIcon className="h-5 w-5" />{" "}
+                      {/* Heroicons PlusIcon */}
+                      Add Person
                     </button>
                   </div>
                 )}
